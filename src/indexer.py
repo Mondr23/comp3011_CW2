@@ -1,24 +1,3 @@
-"""
-indexer.py
-----------
-Builds an inverted index from crawled page data and handles
-saving/loading the index to/from disk as JSON.
-
-Index structure:
-    {
-        "word": {
-            "https://example.com/page/": {
-                "frequency": 3,
-                "positions": [4, 17, 102]
-            }
-        }
-    }
-
-- Keys are lowercase words (case-insensitive search).
-- frequency: how many times the word appears on that page.
-- positions: word offsets (0-indexed) within the page's token list.
-"""
-
 import json
 import os
 import re

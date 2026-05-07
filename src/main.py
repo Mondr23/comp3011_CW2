@@ -1,21 +1,6 @@
-"""
-main.py
--------
-Command-line shell for the COMP3011 Search Engine.
-
-Commands:
-    build          Crawl the website, build and save the index.
-    load           Load the index from disk.
-    print <word>   Show index entry for a word.
-    find <query>   Find pages containing all query words.
-    help           Show this help message.
-    quit / exit    Exit the shell.
-"""
-
 import sys
 import os
 
-# Make src/ importable when running as `python src/main.py`
 sys.path.insert(0, os.path.dirname(__file__))
 
 from crawler import crawl, BASE_URL
@@ -60,7 +45,7 @@ def run_shell() -> None:
         command = parts[0].lower()
         argument = parts[1] if len(parts) > 1 else ""
 
-        # ── build ──────────────────────────────────────────────────────────
+        #  build 
         if command == "build":
             print(f"\nCrawling {BASE_URL} …\n")
             pages = crawl(verbose=True)
@@ -71,7 +56,7 @@ def run_shell() -> None:
             save_index(index, INDEX_PATH)
             print(f"\nDone. Index contains {len(index)} unique words.\n")
 
-        # ── load ───────────────────────────────────────────────────────────
+        #  load 
         elif command == "load":
             try:
                 index = load_index(INDEX_PATH)
@@ -79,7 +64,7 @@ def run_shell() -> None:
             except FileNotFoundError as e:
                 print(f"[ERROR] {e}\n")
 
-        # ── print ──────────────────────────────────────────────────────────
+        #  print 
         elif command == "print":
             if index is None:
                 print("[ERROR] No index loaded. Run 'build' or 'load' first.\n")
@@ -88,7 +73,7 @@ def run_shell() -> None:
             else:
                 print_word(index, argument)
 
-        # ── find ───────────────────────────────────────────────────────────
+        #  find 
         elif command == "find":
             if index is None:
                 print("[ERROR] No index loaded. Run 'build' or 'load' first.\n")
@@ -97,16 +82,16 @@ def run_shell() -> None:
             else:
                 cmd_find(index, argument)
 
-        # ── help ───────────────────────────────────────────────────────────
+        #  help 
         elif command in ("help", "?"):
             print(HELP_TEXT)
 
-        # ── quit ───────────────────────────────────────────────────────────
+        #  quit 
         elif command in ("quit", "exit", "q"):
             print("Goodbye!")
             break
 
-        # ── unknown ────────────────────────────────────────────────────────
+        #  unknown 
         else:
             print(f"Unknown command: '{command}'. Type 'help' for usage.\n")
 

@@ -1,13 +1,3 @@
-"""
-search.py
----------
-Implements the 'print' and 'find' commands for the search engine.
-
-- print <word>         : Show all pages containing that word + stats.
-- find <word> [words…] : Return pages containing ALL the given words
-                         (AND logic for multi-word queries).
-"""
-
 from indexer import tokenise
 
 

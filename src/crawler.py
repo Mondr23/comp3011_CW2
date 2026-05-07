@@ -1,12 +1,3 @@
-"""
-crawler.py
-----------
-Crawls all pages of https://quotes.toscrape.com/ with a configurable
-politeness window (default: 6 seconds) between requests.
-
-Returns a list of (url, page_text) tuples for the indexer to process.
-"""
-
 import time
 import requests
 from bs4 import BeautifulSoup
