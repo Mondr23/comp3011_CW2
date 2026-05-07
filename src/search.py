@@ -146,10 +146,118 @@ def find_pages(index: dict, query: str) -> list[str]:
 
     return sorted(matching_pages)
 
+def is_phrase_query(query: str) -> bool:
+    """
+    Check if the user is searching for an exact phrase
+
+    A phrase search starts and ends with quote marks
+    """
+    query = query.strip()
+    return (
+        len(query) >= 2
+        and query[0] in ('"', "'")
+        and query[-1] in ('"', "'")
+    )
+ 
+def phrase_search(index: dict, phrase: str, pagerank: dict = None) -> list:
+    """
+    Find pages that contain the exact phrase.
+
+    The words must appear next to each other and in the same order.
+
+    Args:
+        index: The inverted index.
+        phrase: The phrase to search for.
+        pagerank: Optional PageRank scores used to rank results.
+
+    Returns:
+        A list of matching pages with their scores, sorted from best to worst.
+        Returns an empty list if no matches are found.
+    """
+    words = tokenise(phrase)
+ 
+    if not words:
+        return []
+ 
+    # Single word phrase
+    if len(words) == 1:
+        return find_pages(index, words[0], pagerank)
+ 
+    # Step 1: find pages containing ALL words (AND logic)
+    if words[0] not in index:
+        return []
+ 
+    candidate_pages = set(index[words[0]].keys())
+    for word in words[1:]:
+        if word not in index:
+            return []
+        candidate_pages &= set(index[word].keys())
+ 
+    if not candidate_pages:
+        return []
+ 
+    # Step 2: for each candidate page, check consecutive positions
+    matching_pages = []
+    total_pages = max(len(urls) for urls in index.values())
+ 
+    for url in candidate_pages:
+ 
+        # Get positions of the first word on this page
+        first_word_positions = index[words[0]][url]["positions"]
+ 
+        # Try each starting position of the first word
+        phrase_found = False
+        for start_pos in first_word_positions:
+ 
+            # Check every subsequent word appears at start_pos + offset
+            consecutive = True
+            for offset, word in enumerate(words[1:], start=1):
+                expected_pos = start_pos + offset
+                actual_positions = index[word][url]["positions"]
+ 
+                if expected_pos not in actual_positions:
+                    consecutive = False
+                    break   # this starting position doesn't work
+ 
+            if consecutive:
+                phrase_found = True
+                break       # found at least one match 
+ 
+        if phrase_found:
+            # Score using TF-IDF + PageRank same as regular search
+            score = sum(
+                tf_idf(index, word, url, total_pages)
+                for word in words
+            )
+            matching_pages.append((score, url))
+ 
+    # Sort highest score first
+    matching_pages.sort(key=lambda x: x[0], reverse=True)
+    return matching_pages
+ 
 def cmd_find(index: dict, query: str) -> None:
     """
-    CLI wrapper for find_pages — prints results in a human-friendly way.
+    CLI wrapper for find_pages 
     """
+        # ── Phrase search ──────────────────────────────────────────────────────
+    if is_phrase_query(query):
+        phrase = query.strip()[1:-1].strip()
+        if not phrase:
+            print("Please provide a phrase inside the quotes.\n")
+            return
+        print(f'\nPhrase search: "{phrase}"')
+        results = phrase_search(index, phrase)
+        if not results:
+            print(f'  No pages found containing the exact phrase "{phrase}".')
+        else:
+            print(f"\n{len(results)} page(s) contain the exact phrase:\n")
+            for rank, (score, url) in enumerate(results, start=1):
+                print(f"  {rank}. {url}")
+                print(f"     Score: {score:.4f}")
+        print()
+        return
+    
+    # Normal search
     words = tokenise(query)
 
     if not words:
