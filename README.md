@@ -125,8 +125,6 @@ When a word is not found in the index, `difflib.get_close_matches` compares it a
 
 ## Testing
 
-bash
-
 ```bash
 # Run all tests
 python -m pytest tests/ -v
@@ -136,9 +134,14 @@ pip install pytest-cov
 python -m pytest tests/ --cov=src --cov-report=term-missing
 ```
 
-The test suite contains 74 tests across three files. Each function has dedicated unit tests. Crawler tests use `unittest.mock` to simulate HTTP responses so no real network requests are made during testing. Edge cases tested include empty queries, unknown words, typos, numeric-only input, case variations, and phrase matching with non-consecutive positions.
+The test suite contains **84 tests** across four files with **89% code coverage**, covering every module in the project.
 
----
+- **test_crawler.py** — tests for page fetching, text extraction, link discovery, and the crawl loop. HTTP requests are simulated using `unittest.mock` so no real network connection is needed during testing.
+- **test_indexer.py** — tests for tokenisation, index building, and saving and loading the index to disk using temporary files so the real index is never touched during testing.
+- **test_search.py** — tests for TF-IDF scoring, phrase search, query suggestions, AND logic, and the full `cmd_find` function including all edge cases.
+- **test_main.py** — tests for the CLI shell covering every command including `build`, `load`, `find`, `print`, `help`, and `quit`.
+
+Edge cases tested include empty queries, unknown words, typos, numeric only input, case variations, phrase matching with non-consecutive positions, missing index file, empty quotes, and commands typed without arguments.
 
 ## Dependencies
 

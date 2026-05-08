@@ -78,7 +78,7 @@ def run_shell() -> None:
             if index is None:
                 print("[ERROR] No index loaded. Run 'build' or 'load' first.\n")
             elif not argument:
-                print("Usage: find <word> [word2 ...]\n")
+                print("Please provide at least one search term.\n")
             else:
                 cmd_find(index, argument)
 
