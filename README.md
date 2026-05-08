@@ -1,7 +1,3 @@
-## MD
-
-Copy
-
 # COMP3011 Coursework 2 — Search Engine Tool
 
 ## Features
@@ -77,7 +73,6 @@ python src/main.py
 | `find <word> [word2 ...]` | Find pages containing all the given words, ranked by TF-IDF                |
 | `find "phrase here"`      | Phrase search — words must appear consecutively on the page               |
 | `quit`/`exit`           | Exit the shell                                                             |
-
 
 ---
 
