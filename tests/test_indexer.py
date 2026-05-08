@@ -6,6 +6,8 @@ import tempfile
 # Let tests import files from the src folder
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
+# Protect the real index from being overwritten during tests
+REAL_INDEX = os.path.join(os.path.dirname(__file__), "..", "data", "index.json")
 import pytest
 from indexer import tokenise, build_index, save_index, load_index
 
@@ -109,15 +111,14 @@ class TestIndexPersistence:
     }
 
     def test_save_then_load_gives_same_data(self):
-        with tempfile.NamedTemporaryFile(suffix=".json", mode="w", delete=False) as f:
+        with tempfile.NamedTemporaryFile(
+            suffix=".json", mode="w", delete=False
+        ) as f:
             tmp_path = f.name
 
         try:
-            save_index(self.SAMPLE_INDEX)
-
-            from indexer import INDEX_PATH
-            loaded = load_index(INDEX_PATH)
-
+            save_index(self.SAMPLE_INDEX, tmp_path)  # ← save to temp file
+            loaded = load_index(tmp_path)             # ← load from temp file
             assert loaded == self.SAMPLE_INDEX
         finally:
             os.unlink(tmp_path)
@@ -127,16 +128,15 @@ class TestIndexPersistence:
             load_index("/tmp/this_file_does_not_exist_12345.json")
 
     def test_saved_file_is_valid_json(self):
-        with tempfile.NamedTemporaryFile(suffix=".json", mode="w", delete=False) as f:
+        with tempfile.NamedTemporaryFile(
+            suffix=".json", mode="w", delete=False
+        ) as f:
             tmp_path = f.name
 
         try:
-            save_index(self.SAMPLE_INDEX)
-
-            from indexer import INDEX_PATH
-            with open(INDEX_PATH) as f:
+            save_index(self.SAMPLE_INDEX, tmp_path)  # ← save to temp file
+            with open(tmp_path) as f:
                 data = json.load(f)
-
             assert isinstance(data, dict)
         finally:
             os.unlink(tmp_path)
