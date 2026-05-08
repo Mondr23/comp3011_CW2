@@ -9,7 +9,7 @@ from search import print_word, cmd_find
 
 BANNER = """
 ╔══════════════════════════════════════════╗
-║   COMP3011 Search Engine  –  CW2        ║
+║               Search Engine              ║
 ╚══════════════════════════════════════════╝
 Type 'help' for available commands.
 """
